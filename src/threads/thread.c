@@ -213,10 +213,13 @@ thread_create (const char *name, int priority,
 
   intr_set_level (old_level);
   /* add lock to lock_list if one is given */
+if(aux == NULL){
   if(is_lock(aux)){
       list_push_front(&lock_list, &aux->elem);
       priority_donate(aux);
    }//end if 
+}	
+  
 	
   /* Add to run queue. */
   thread_unblock (t);
