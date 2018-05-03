@@ -224,11 +224,11 @@ lock_acquire (struct lock *lock)
   ASSERT (!lock_held_by_current_thread (lock));
 
   /* check if the lock has already been hold */
-  if ((lock -> holder)!=NULL) {
-    /* set current thread to waiting lock */
-    //thread_current() -> wait_on_lock = lock;
-    /*reorder the wait list*/
-  }
+//   if ((lock -> holder)!=NULL) {
+//     /* set current thread to waiting lock */
+//     thread_current() -> wait_on_lock = lock;
+//     /*reorder the wait list*/
+//   }
    
   /* 
    * no threads hold lock.
