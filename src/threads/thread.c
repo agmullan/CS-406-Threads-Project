@@ -70,6 +70,7 @@ static struct thread *running_thread (void);
 static struct thread *next_thread_to_run (void);
 static void init_thread (struct thread *, const char *name, int priority);
 static bool is_thread (struct thread *) UNUSED;
+static bool is_lock (struct lock *) UNUSED;
 static void *alloc_frame (struct thread *, size_t size);
 static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
@@ -212,16 +213,14 @@ thread_create (const char *name, int priority,
 
   intr_set_level (old_level);
   /* add lock to lock_list if one is given */
-// 	if(is_lock(aux)){
-//           list_push_front(&lock_list, &aux->elem);
-// 	}//end if
+  if(is_lock(aux)){
+      list_push_front(&lock_list, &aux->elem);
+      priority_donate(aux);
+   }//end if 
+	
   /* Add to run queue. */
   thread_unblock (t);
-
   thread_yield(); //added this
-// 	if(aux != NULL){
-// 	priority_donate(aux);
-// 	}
 	
   return tid;
 }
@@ -492,6 +491,13 @@ static bool
 is_thread (struct thread *t)
 {
   return t != NULL && t->magic == THREAD_MAGIC;
+}
+
+/* Returns true if lock appears to point to a valid lock. */
+static bool
+is_lock (struct lock *lock)
+{
+  return lock != NULL && is_thread(lock->holder);
 }
 
 /* Does basic initialization of T as a blocked thread named
