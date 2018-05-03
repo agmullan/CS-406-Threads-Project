@@ -215,7 +215,9 @@ thread_create (const char *name, int priority,
   /* add lock to lock_list if one is given */
 if(aux != NULL){
   if(is_lock(aux)){
-      list_push_front(&lock_list, aux->elem);
+	  struct lock lock;  
+	  lock_init (&lock);
+      list_push_front(&lock_list, lock->elem);
       priority_donate(aux);
    }//end if 
 }	
