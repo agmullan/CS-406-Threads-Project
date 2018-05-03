@@ -217,7 +217,7 @@ if(aux != NULL){
   if(is_lock(aux)){
 	  struct lock lock;  
 	  lock_init (&lock);
-      list_push_front(&lock_list);
+      list_push_front(&lock_list, &lock->elem);
       priority_donate(aux);
    }//end if 
 }	
