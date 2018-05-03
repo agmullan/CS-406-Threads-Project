@@ -223,9 +223,21 @@ lock_acquire (struct lock *lock)
   ASSERT (!intr_context ());
   ASSERT (!lock_held_by_current_thread (lock));
 
+  /* check if the lock has already been hold */
+  if ((lock -> holder)!=NULL) {
+    /* set current thread to waiting lock */
+    thread_current() -> wait_on_lock = lock;
+    /*reorder the wait list*/
+  }
+   
+  /* 
+   * no threads hold lock.
+   * if lock already hold by some thread, other thread will be block due to sema_down().
+   */
   sema_down (&lock->semaphore);
+  thread_current() -> wait_on_lock = NULL;
   lock->holder = thread_current ();
-   list_push_back(&lock_list, &lock->holder->elem);
+  list_push_back(&lock_list, &lock->holder->elem);
 }
 
 /* Tries to acquires LOCK and returns true if successful or false
