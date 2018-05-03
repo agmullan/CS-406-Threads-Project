@@ -502,7 +502,7 @@ is_thread (struct thread *t)
 static bool
 is_lock (struct lock *lock)
 {
-  return lock != NULL && is_thread(lock->holder);
+  return lock != NULL && (lock->holder != NULL);
 }
 
 /* Does basic initialization of T as a blocked thread named
