@@ -42,6 +42,10 @@
 
    - up or "V": increment the value (and wake up one waiting
      thread, if any). */
+
+/* lock list */
+static struct list lock_list;
+
 void
 sema_init (struct semaphore *sema, unsigned value)
 {
@@ -201,6 +205,7 @@ lock_init (struct lock *lock)
 
   lock->holder = NULL;
   sema_init (&lock->semaphore, 1);
+  list_init (&lock_list);
 }
 
 /* Acquires LOCK, sleeping until it becomes available if
@@ -220,6 +225,7 @@ lock_acquire (struct lock *lock)
 
   sema_down (&lock->semaphore);
   lock->holder = thread_current ();
+   list_push_back(&lock_list, &lock->holder.elem);
 }
 
 /* Tries to acquires LOCK and returns true if successful or false
