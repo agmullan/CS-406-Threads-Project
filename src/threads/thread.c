@@ -94,12 +94,14 @@ thread_init (void)
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
+  list_init (&old_priority_list);
 
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
   init_thread (initial_thread, "main", PRI_DEFAULT);
   initial_thread->status = THREAD_RUNNING;
   initial_thread->tid = allocate_tid ();
+	
 }
 
 /* Starts preemptive thread scheduling by enabling interrupts.
@@ -380,6 +382,7 @@ set_priority (int new_priority, struct thread *thread)
   enum intr_level old_level;
   old_level = intr_disable ();
   thread->old_priority = new_priority;
+  list_push_back(&old_priority_list, new_priority);
   thread->priority = new_priority;
   list_sort(&ready_list, priority_sort, NULL);
   intr_set_level (old_level);
@@ -508,6 +511,7 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->old_priority = priority;
+  list_push_back(&old_priority_list, new priority);
   t->priority = priority;
   t->magic = THREAD_MAGIC;
   list_push_back (&all_list, &t->allelem);
@@ -612,6 +616,8 @@ priority_return(struct lock *lock){
 	lock_release(lock);
 	struct thread *cur = thread_current(); //set a current thread
 	cur->priority = cur->old_priority;
+	if(!list_empty(&old_priority_list))
+		cur->priority = list_pop_back(&old_priority_list);
 }
 
 /* Completes a thread switch by activating the new thread's page
